@@ -5,19 +5,56 @@ import { Id, Task } from "../types";
 interface Props {
     task: Task;
     deleteTask: (id: Id) => void;
+    updateTask: (id: Id, content: string) => void;
 }
+
 function TaskCard(props: Props) {
-    const { task, deleteTask } = props;
+    const { task, deleteTask, updateTask } = props;
 
     const [mouseIsOver, setMouseIsOver] = useState(false);
+    const [editMode, setEditMode] = useState(false);
+
+    const toggleEditMode = () => {
+        setEditMode(!editMode);
+        setMouseIsOver(false);
+    }
+
+    if (editMode) {
+        return (
+            <div
+                className="flex bg-blue-700 w-full rounded-md p-2 gap-2 text-left items-center border-2 border-white cursor-grab min-h-[100px] h-[100px] relative">
+                <textarea
+                    className="h-[90%] w-full resize-none border-none rounded-md bg-transparent p-2 focus:outline-none"
+                    value={task.content}
+                    autoFocus
+                    placeholder="Task content"
+                    onBlur={toggleEditMode}
+                    onKeyDown={(e) => {
+                        if (e.key === "Enter" && e.shiftKey) {
+                            toggleEditMode();
+                        }
+                    }}
+                    onChange={(e) => updateTask(task.id, e.target.value)}
+                >
+
+                </textarea>
+            </div>
+        );
+    }
 
     return (
         <div
-            className="flex bg-blue-600 border-blue-600 w-full rounded-md p-2 gap-2 text-left items-center border-2 hover:border-white cursor-grab min-h-[100px] h-[100px] relative"
+            className="flex bg-blue-600 border-blue-600 w-full rounded-md p-2 gap-2 text-left items-center border-2 hover:border-white cursor-grab min-h-[100px] h-[100px] relative task"
             onMouseEnter={() => setMouseIsOver(true)}
             onMouseLeave={() => setMouseIsOver(false)}
+            onClick={toggleEditMode}
         >
-            {task.content}
+            <p
+                className="my-auto h-[90%] w-full text-white overflow-y-auto overflow-x-hidden whitespace-pre-wrap"
+            >
+                {task.content}
+            </p>
+
             {mouseIsOver &&
                 <button
                     className="stroke-white absolute right-2 top-1/2 -translate-y-1/2 p-2 opacity-60 hover:opacity-100"
