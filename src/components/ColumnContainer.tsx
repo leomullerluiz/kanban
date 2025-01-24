@@ -11,12 +11,13 @@ interface Props {
     deleteColumn: (id: Id) => void;
     updateColumn: (id: Id, title: string) => void;
     createNewTask: (columnId: Id) => void;
+    deleteTask: (id: Id) => void;
     tasks: Task[];
 }
 
 function ColumnContainer(props: Props) {
 
-    const { column, deleteColumn, updateColumn, createNewTask, tasks } = props;
+    const { column, deleteColumn, updateColumn, createNewTask, deleteTask, tasks } = props;
 
     const [editMode, setEditMode] = useState(false);
 
@@ -84,7 +85,11 @@ function ColumnContainer(props: Props) {
                 {tasks.length > 0 &&
                     <div className="flex flex-col w-full gap-2">
                         {tasks.map((task) => (
-                            <TaskCard key={task.id} task={task} />
+                            <TaskCard
+                                key={task.id}
+                                task={task}
+                                deleteTask={deleteTask}
+                            />
                         ))}
                     </div>
                 }
