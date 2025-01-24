@@ -2,8 +2,8 @@ import { useMemo, useState } from "react"
 import Plus from "../icons/Plus"
 import { Column, Id } from "../types"
 import ColumnContainer from "./ColumnContainer";
-import { DndContext, DragOverlay, DragStartEvent } from "@dnd-kit/core";
-import { SortableContext } from "@dnd-kit/sortable";
+import { DndContext, DragEndEvent, DragOverlay, DragStartEvent, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
+import { arrayMove, SortableContext } from "@dnd-kit/sortable";
 import { createPortal } from "react-dom";
 
 function KanbanBoard() {
@@ -11,6 +11,12 @@ function KanbanBoard() {
     const columnsId = useMemo(() => columns.map((column) => column.id), [columns])
 
     const [activeColumn, setActiveColumn] = useState<Column | null>(null);
+
+    const sensors = useSensors(useSensor(PointerSensor, {
+        activationConstraint: {
+            distance: 10, //Active when the pointer is within 10px of the sensor
+        }
+    }))
 
     const createNewColumn = () => {
         const columnToAdd: Column = {
@@ -37,10 +43,28 @@ function KanbanBoard() {
         }
     }
 
+    const onDragEnd = (event: DragEndEvent) => {
+        console.log("DRAG END", event);
+        const { active, over } = event;
+        if (!over) return;
+
+        const activeColumnId = active.id;
+        const overColumnId = over.id;
+
+        if (activeColumnId === overColumnId) return;
+
+        setColumns((columns) => {
+            const activeColumnIndex = columns.findIndex((column) => column.id === activeColumnId);
+            const overColumnIndex = columns.findIndex((column) => column.id === overColumnId);
+
+            return arrayMove(columns, activeColumnIndex, overColumnIndex);
+        })
+    }
+
     return (
         <div className="m-auto flex min-h-screen w-full items-center overflow-x-auto overflow-y-hidden px-[40px]">
             <div className="m-auto flex gap-2">
-                <DndContext onDragStart={onDragStart}>
+                <DndContext sensors={sensors} onDragStart={onDragStart} onDragEnd={onDragEnd}>
                     <div className="flex gap-4">
                         <SortableContext items={columnsId} >
                             {columns.map((column) => (
