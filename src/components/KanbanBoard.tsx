@@ -31,6 +31,14 @@ function KanbanBoard() {
         setColumns(filteredColumns);
     }
 
+    const updateColumn = (id: Id, title: string) => {
+        const newColumns = columns.map((column) => {
+            if (column.id !== id) return column;
+            return { ...column, title };
+        })
+        setColumns(newColumns);
+    }
+
     const generateId = () => {
         return Math.floor(Math.random() * 100001);
     }
@@ -72,6 +80,7 @@ function KanbanBoard() {
                                     key={column.id}
                                     column={column}
                                     deleteColumn={deleteColumn}
+                                    updateColumn={updateColumn}
                                 />
                             ))}
                         </SortableContext>
@@ -79,7 +88,11 @@ function KanbanBoard() {
                     </div>
                     {createPortal(<DragOverlay>
                         {activeColumn && (
-                            <ColumnContainer column={activeColumn} deleteColumn={deleteColumn} />
+                            <ColumnContainer
+                                column={activeColumn}
+                                deleteColumn={deleteColumn}
+                                updateColumn={updateColumn}
+                            />
                         )}
                     </DragOverlay>, document.body)}
                 </DndContext>
