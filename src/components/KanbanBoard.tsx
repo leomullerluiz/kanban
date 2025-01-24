@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react"
 import Plus from "../icons/Plus"
-import { Column, Id } from "../types"
+import { Column, Id, Task } from "../types"
 import ColumnContainer from "./ColumnContainer";
 import { DndContext, DragEndEvent, DragOverlay, DragStartEvent, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { arrayMove, SortableContext } from "@dnd-kit/sortable";
@@ -8,9 +8,20 @@ import { createPortal } from "react-dom";
 
 function KanbanBoard() {
     const [columns, setColumns] = useState<Column[]>([]);
-    const columnsId = useMemo(() => columns.map((column) => column.id), [columns])
+    const columnsId = useMemo(() => columns.map((column) => column.id), [columns]);
+    const [tasks, setTasks] = useState<Task[]>([]);
 
     const [activeColumn, setActiveColumn] = useState<Column | null>(null);
+
+    const createNewTask = (columnId: Id) => {
+        const newTask: Task = {
+            id: generateId(),
+            columnId,
+            content: `Task ${tasks.length + 1}`
+        }
+        setTasks([...tasks, newTask]);
+    }
+
 
     const sensors = useSensors(useSensor(PointerSensor, {
         activationConstraint: {
@@ -81,6 +92,8 @@ function KanbanBoard() {
                                     column={column}
                                     deleteColumn={deleteColumn}
                                     updateColumn={updateColumn}
+                                    createNewTask={createNewTask}
+                                    tasks={tasks.filter((task) => task.columnId === column.id)}
                                 />
                             ))}
                         </SortableContext>
@@ -92,6 +105,8 @@ function KanbanBoard() {
                                 column={activeColumn}
                                 deleteColumn={deleteColumn}
                                 updateColumn={updateColumn}
+                                createNewTask={createNewTask}
+                                tasks={tasks.filter((task) => task.columnId === activeColumn.id)}
                             />
                         )}
                     </DragOverlay>, document.body)}
