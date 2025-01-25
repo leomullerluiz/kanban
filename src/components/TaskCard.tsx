@@ -1,6 +1,8 @@
 import { useState } from "react";
 import Delete from "../icons/Delete";
 import { Id, Task } from "../types";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 interface Props {
     task: Task;
@@ -14,14 +16,42 @@ function TaskCard(props: Props) {
     const [mouseIsOver, setMouseIsOver] = useState(false);
     const [editMode, setEditMode] = useState(false);
 
+    const { setNodeRef, attributes, listeners, transform, transition, isDragging } = useSortable({
+        id: task.id,
+        data: {
+            type: "Task",
+            task,
+        },
+        disabled: editMode,
+    });
+
+    const style = {
+        transition,
+        transform: CSS.Transform.toString(transform),
+    }
+
     const toggleEditMode = () => {
         setEditMode(!editMode);
         setMouseIsOver(false);
     }
 
+    if (isDragging) {
+        return (
+            <div
+                ref={setNodeRef}
+                style={style}
+                className="flex bg-blue-700 w-full rounded-md p-2 gap-2 text-left items-center border-2 border-white cursor-grab min-h-[100px] h-[100px] relative opacity-30"
+            />
+        );
+    }
+
     if (editMode) {
         return (
             <div
+                ref={setNodeRef}
+                style={style}
+                {...attributes}
+                {...listeners}
                 className="flex bg-blue-700 w-full rounded-md p-2 gap-2 text-left items-center border-2 border-white cursor-grab min-h-[100px] h-[100px] relative">
                 <textarea
                     className="h-[90%] w-full resize-none border-none rounded-md bg-transparent p-2 focus:outline-none"
@@ -44,6 +74,10 @@ function TaskCard(props: Props) {
 
     return (
         <div
+            ref={setNodeRef}
+            style={style}
+            {...attributes}
+            {...listeners}
             className="flex bg-blue-600 border-blue-600 w-full rounded-md p-2 gap-2 text-left items-center border-2 hover:border-white cursor-grab min-h-[100px] h-[100px] relative task"
             onMouseEnter={() => setMouseIsOver(true)}
             onMouseLeave={() => setMouseIsOver(false)}
