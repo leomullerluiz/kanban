@@ -6,6 +6,8 @@
 
 This is a fully functional Kanban board application built using **ReactJS**, **TypeScript**, **TailwindCSS**, and the **@dnd-kit** library. It allows users to manage tasks and organize them into columns using a drag-and-drop interface. 
 
+View the demo at [https://kanban.leomullerluiz.com](https://kanban.leomullerluiz.com).
+
 ### Features
 
 - **Responsive Design:** Styled with TailwindCSS for a clean and modern look across all devices.
